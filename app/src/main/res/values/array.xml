@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="camera_choices">
+        <item>Take Picture</item>
+        <item>Choose Picture</item>
+        <item>Take Video</item>
+        <item>Choose Video</item>
+    </string-array>
+</resources>
