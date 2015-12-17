@@ -3,5 +3,5 @@
     <string name="error_external_storage">There was a problem accessing your device\'s external storage</string>
     <string name="general_error">Sorry, there was an error!</string>
     <string name="error_opening_file">There was a problem with the selected file.</string>
-    <string name="file_too_large_error">The selected file is too large. Select a new file!
+    <string name="file_too_large_error">The selected file is too large. Select a new file!</string>
 </resources>
