@@ -61,7 +61,6 @@ public class MainListFragment extends ListFragment {
         super.onResume();
 
         fileNames = new ArrayList<>();
-
         simpleAdapter = new SimpleAdapter(getActivity(), fileNames,
                 R.layout.bucket_item, new String[]{
                 "key"
@@ -89,14 +88,30 @@ public class MainListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                Intent intent = new Intent(getActivity(), ShowSnapActivity.class);
-                intent.putExtra("key", (String) fileNames.get(pos).get("key"));
-
-                startActivity(intent);
+                int type = getFileType((String) fileNames.get(pos).get("key"));
+                if (type == MainActivity.MEDIA_TYPE_IMAGE) {
+                    // Display Image
+                    Intent intent = new Intent(getActivity(), ViewImageActvity.class);
+                    intent.putExtra("key", (String) fileNames.get(pos).get("key"));
+                    startActivity(intent);
+                } else {
+                    // Display Video
+                    Intent intent = new Intent(getActivity(), ViewVideoActivity.class);
+                    intent.putExtra("key", (String) fileNames.get(pos).get("key"));
+                    startActivity(intent);
+                }
             }
         });
 
         new GetFileListTask().execute();
+    }
+
+    private int getFileType(String key) {
+        if (key.contains(".jpg")) {
+            return MainActivity.MEDIA_TYPE_IMAGE;
+        } else {
+            return MainActivity.MEDIA_TYPE_VIDEO;
+        }
     }
 
     /**

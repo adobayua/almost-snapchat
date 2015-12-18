@@ -20,9 +20,9 @@ import java.util.TimerTask;
 /**
  * Created by Ratik on 18/12/15.
  */
-public class ShowSnapActivity extends AppCompatActivity {
+public class ViewImageActvity extends AppCompatActivity {
 
-    private static final String TAG = ShowSnapActivity.class.getSimpleName();
+    private static final String TAG = ViewImageActvity.class.getSimpleName();
     private String key;
 
     private ProgressBar progressBar;
