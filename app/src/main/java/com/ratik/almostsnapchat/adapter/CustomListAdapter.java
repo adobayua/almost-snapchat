@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -38,15 +39,28 @@ public class CustomListAdapter extends SimpleAdapter implements Filterable {
         ViewHolder holder;
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.bucket_item, parent, false);
+            convertView = inflater.inflate(R.layout.snap_list_item, parent, false);
             holder = new ViewHolder();
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        // Storing key
+        String text = (String) fileNames.get(position).get("key");
+
         holder.textView = (TextView) convertView.findViewById(R.id.key);
-        holder.textView.setText((String) fileNames.get(position).get("key"));
+        holder.imageView = (ImageView) convertView.findViewById(R.id.snapTypeView);
+
+        if(text.contains(".jpg")) {
+            // Image
+            holder.textView.setText("Image Message");
+            holder.imageView.setImageResource(R.drawable.ic_image);
+        } else {
+            // Video
+            holder.textView.setText("Video Message");
+            holder.imageView.setImageResource(R.drawable.ic_video);
+        }
 
         return convertView;
     }
@@ -54,5 +68,6 @@ public class CustomListAdapter extends SimpleAdapter implements Filterable {
 
     private class ViewHolder {
         TextView textView;
+        ImageView imageView;
     }
 }

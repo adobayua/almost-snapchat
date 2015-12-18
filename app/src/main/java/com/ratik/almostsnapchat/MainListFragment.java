@@ -59,7 +59,7 @@ public class MainListFragment extends ListFragment {
     public void onResume() {
         super.onResume();
         fileNames = new ArrayList<>();
-        simpleAdapter = new CustomListAdapter(getActivity(), fileNames, R.layout.bucket_item,
+        simpleAdapter = new CustomListAdapter(getActivity(), fileNames, R.layout.snap_list_item,
                 new String[]{ "key" }, new int[]{ R.id.key });
 
         setListAdapter(simpleAdapter);
