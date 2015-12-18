@@ -43,7 +43,7 @@ public class ShowSnapActivity extends AppCompatActivity {
     private void downloadMedia() {
 
         GeneratePresignedUrlRequest urlRequest = new GeneratePresignedUrlRequest(Constants.MY_BUCKET, key);
-        urlRequest.setExpiration(new Date(System.currentTimeMillis() + 10000));
+        urlRequest.setExpiration(new Date(System.currentTimeMillis() + 60000));
 
         // Initialize the Amazon Cognito credentials provider
         CognitoCachingCredentialsProvider credentialsProvider =

@@ -37,6 +37,8 @@ public class MainListFragment extends ListFragment {
     // Hashmap
     private ArrayList<HashMap<String, Object>> fileNames;
 
+    private int mPos;
+
     public MainListFragment() {
         // Nothing here
     }
@@ -45,6 +47,12 @@ public class MainListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+//        if (savedInstanceState != null) {
+//            mPos = savedInstanceState.getInt("pos");
+//            fileNames.remove(mPos);
+//            simpleAdapter.notifyDataSetChanged();
+//        }
     }
 
     @Override
@@ -106,14 +114,28 @@ public class MainListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                Toast.makeText(getActivity(), "Start download", Toast.LENGTH_LONG).show();
+                mPos = pos;
                 Intent intent = new Intent(getActivity(), ShowSnapActivity.class);
                 intent.putExtra("key", (String) fileNames.get(pos).get("key"));
+
+
+
                 startActivity(intent);
             }
         });
 
         new GetFileListTask().execute();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("pos", mPos);
     }
 
     /**
