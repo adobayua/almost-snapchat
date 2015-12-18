@@ -16,21 +16,29 @@
 package com.ratik.almostsnapchat;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 /*
  * Handles basic helper functions used throughout the app.
  */
 public class Util {
 
+    private static final String TAG = Util.class.getSimpleName();
+
     // We only need one instance of the clients and credentials provider
     private static AmazonS3Client sS3Client;
     private static CognitoCachingCredentialsProvider sCredProvider;
-    private static TransferUtility sTransferUtility;
 
     /**
      * Gets an instance of CognitoCachingCredentialsProvider which is
@@ -62,4 +70,50 @@ public class Util {
         }
         return sS3Client;
     }
+
+    public static void saveViewedFileName(Context context, String name) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+                    context.openFileOutput("filenames.txt", Context.MODE_APPEND));
+            outputStreamWriter.write(name + "\n");
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    public static String[] getViewedFilenames(Context context) {
+        String data = "";
+
+        try {
+            InputStream inputStream = context.openFileInput("filenames.txt");
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString + "\n");
+                }
+
+                inputStream.close();
+                data = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e(TAG, "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e(TAG, "Can't read file: " + e.toString());
+        }
+
+        if (!data.isEmpty()) {
+            String[] viewedFiles = data.split("\n");
+            return viewedFiles;
+        } else {
+            return null;
+        }
+    }
+
 }

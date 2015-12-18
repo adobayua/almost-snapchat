@@ -10,11 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ProgressBar;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.ratik.almostsnapchat.adapter.CustomListAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ import java.util.List;
 public class MainListFragment extends ListFragment {
 
     private AmazonS3Client s3;
-    private SimpleAdapter simpleAdapter;
+    private CustomListAdapter simpleAdapter;
     private ArrayList<HashMap<String, Object>> fileNames;
 
     private ProgressBar progressBar;
@@ -59,28 +58,10 @@ public class MainListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-
         fileNames = new ArrayList<>();
-        simpleAdapter = new SimpleAdapter(getActivity(), fileNames,
-                R.layout.bucket_item, new String[]{
-                "key"
-        },
-                new int[]{
-                        R.id.key
-                });
-        simpleAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Object data,
-                                        String textRepresentation) {
-                switch (view.getId()) {
-                    case R.id.key:
-                        TextView fileName = (TextView) view;
-                        fileName.setText((String) data);
-                        return true;
-                }
-                return false;
-            }
-        });
+        simpleAdapter = new CustomListAdapter(getActivity(), fileNames, R.layout.bucket_item,
+                new String[]{ "key" }, new int[]{ R.id.key });
+
         setListAdapter(simpleAdapter);
 
         // When an item is selected, finish the activity and pass back the S3
@@ -88,6 +69,9 @@ public class MainListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                // Save clicked key
+                Util.saveViewedFileName(getActivity(), (String) fileNames.get(pos).get("key"));
+
                 int type = getFileType((String) fileNames.get(pos).get("key"));
                 if (type == MainActivity.MEDIA_TYPE_IMAGE) {
                     // Display Image
@@ -104,6 +88,19 @@ public class MainListFragment extends ListFragment {
         });
 
         new GetFileListTask().execute();
+    }
+
+    private void fixKeys() {
+        String[] blacklistedKeys = Util.getViewedFilenames(getActivity());
+        if (blacklistedKeys != null) {
+            for (int i = 0; i < fileNames.size(); i++) {
+                for (String key : blacklistedKeys) {
+                    if (key.equals(fileNames.get(i).get("key"))) {
+                        fileNames.remove(i);
+                    }
+                }
+            }
+        }
     }
 
     private int getFileType(String key) {
@@ -147,6 +144,8 @@ public class MainListFragment extends ListFragment {
         protected void onPostExecute(Void result) {
             progressBar.setVisibility(View.INVISIBLE);
             getListView().setVisibility(View.VISIBLE);
+            // Filter blacklisted keys
+            fixKeys();
             simpleAdapter.notifyDataSetChanged();
         }
     }
