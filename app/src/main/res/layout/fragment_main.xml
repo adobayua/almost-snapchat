@@ -16,4 +16,11 @@
         android:layout_centerInParent="true"
         android:text="No new almost-snaps" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_centerInParent="true" />
+
 </RelativeLayout>

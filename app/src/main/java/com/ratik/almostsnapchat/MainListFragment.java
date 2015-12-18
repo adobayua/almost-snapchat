@@ -5,18 +5,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
@@ -29,53 +25,32 @@ import java.util.List;
  */
 public class MainListFragment extends ListFragment {
 
-    // The S3 client used for getting the list of objects in the bucket
     private AmazonS3Client s3;
-
     private SimpleAdapter simpleAdapter;
-
-    // Hashmap
     private ArrayList<HashMap<String, Object>> fileNames;
 
-    private int mPos;
-
-    public MainListFragment() {
-        // Nothing here
-    }
+    private ProgressBar progressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-//        if (savedInstanceState != null) {
-//            mPos = savedInstanceState.getInt("pos");
-//            fileNames.remove(mPos);
-//            simpleAdapter.notifyDataSetChanged();
-//        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         return view;
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        // Implemented in the parent activity
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-                // Refresh the file list.
+                getListView().setVisibility(View.INVISIBLE);
                 new GetFileListTask().execute();
-                Toast.makeText(getActivity(), "Refreshing...", Toast.LENGTH_LONG).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -114,28 +89,14 @@ public class MainListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                mPos = pos;
                 Intent intent = new Intent(getActivity(), ShowSnapActivity.class);
                 intent.putExtra("key", (String) fileNames.get(pos).get("key"));
-
-
 
                 startActivity(intent);
             }
         });
 
         new GetFileListTask().execute();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("pos", mPos);
     }
 
     /**
@@ -149,15 +110,9 @@ public class MainListFragment extends ListFragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            // Initialize the Amazon Cognito credentials provider
-            CognitoCachingCredentialsProvider credentialsProvider =
-                    new CognitoCachingCredentialsProvider(
-                            getActivity().getApplicationContext(),
-                            Constants.POOL_ID, // Identity Pool ID
-                            Regions.US_EAST_1 // Region
-                    );
-            s3 = new AmazonS3Client(credentialsProvider);
+            s3 = Util.getS3Client(getActivity());
+            getListView().getEmptyView().setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -175,6 +130,8 @@ public class MainListFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(Void result) {
+            progressBar.setVisibility(View.INVISIBLE);
+            getListView().setVisibility(View.VISIBLE);
             simpleAdapter.notifyDataSetChanged();
         }
     }

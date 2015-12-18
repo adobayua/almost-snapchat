@@ -17,18 +17,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -49,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int VIDEO_QUALITY = 1;
 
     protected Uri mMediaUri;
+
+    private AmazonS3 s3Client;
 
     private DialogInterface.OnClickListener mDialogListener =
             new DialogInterface.OnClickListener() {
@@ -188,16 +186,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void uploadFile() {
-        // Initialize the Amazon Cognito credentials provider
-        CognitoCachingCredentialsProvider credentialsProvider =
-                new CognitoCachingCredentialsProvider(
-                getApplicationContext(),
-                Constants.POOL_ID, // Identity Pool ID
-                Regions.US_EAST_1 // Region
-        );
-
-        AmazonS3 s3Client = new AmazonS3Client(credentialsProvider);
-        TransferUtility transferUtility = new TransferUtility(s3Client, getApplicationContext());
+        AmazonS3 s3Client = Util.getS3Client(this);
+        TransferUtility transferUtility =
+                new TransferUtility(s3Client, getApplicationContext());
 
         File upload = new File(mMediaUri.getPath());
         TransferObserver observer = transferUtility.upload(
@@ -205,6 +196,8 @@ public class MainActivity extends AppCompatActivity {
                 upload.getName(),
                 upload
         );
+
+        Toast.makeText(this, "Posting...", Toast.LENGTH_LONG).show();
 
         observer.setTransferListener(new TransferListener() {
             @Override
@@ -233,19 +226,5 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.refresh:
-                // Not implemented here
-                return false;
-            default:
-                break;
-        }
-
-        return false;
     }
 }

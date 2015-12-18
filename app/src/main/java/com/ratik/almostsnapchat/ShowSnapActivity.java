@@ -3,12 +3,11 @@ package com.ratik.almostsnapchat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -25,6 +24,8 @@ public class ShowSnapActivity extends AppCompatActivity {
 
     private static final String TAG = ShowSnapActivity.class.getSimpleName();
     private String key;
+
+    private ProgressBar progressBar;
     private ImageView imageView;
 
     @Override
@@ -36,29 +37,23 @@ public class ShowSnapActivity extends AppCompatActivity {
         key = intent.getStringExtra("key");
 
         imageView = (ImageView) findViewById(R.id.imageSnapView);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        downloadMedia();
+        getImage();
     }
 
-    private void downloadMedia() {
-
+    private void getImage() {
+        progressBar.setVisibility(View.VISIBLE);
         GeneratePresignedUrlRequest urlRequest = new GeneratePresignedUrlRequest(Constants.MY_BUCKET, key);
         urlRequest.setExpiration(new Date(System.currentTimeMillis() + 60000));
 
-        // Initialize the Amazon Cognito credentials provider
-        CognitoCachingCredentialsProvider credentialsProvider =
-                new CognitoCachingCredentialsProvider(
-                        getApplicationContext(),
-                        Constants.POOL_ID, // Identity Pool ID
-                        Regions.US_EAST_1 // Region
-                );
-
-        AmazonS3 s3Client = new AmazonS3Client(credentialsProvider);
-
+        AmazonS3 s3Client = Util.getS3Client(this);
         URL url = s3Client.generatePresignedUrl(urlRequest);
+
         Picasso.with(this).load(url.toString()).into(imageView, new Callback() {
             @Override
             public void onSuccess() {
+                progressBar.setVisibility(View.INVISIBLE);
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
