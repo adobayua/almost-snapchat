@@ -51,7 +51,7 @@ public class MainListFragment extends ListFragment {
         swipeRefreshLayout.setColorSchemeColors(
                 R.color.colorPrimary,
                 R.color.colorPrimaryDark,
-                R.color.colorAccent,
+                R.color.colorAccent
         );
 
         return view;
