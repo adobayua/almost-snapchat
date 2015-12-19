@@ -24,6 +24,7 @@ import java.util.List;
  */
 public class MainListFragment extends ListFragment {
 
+    private static final String TAG = MainListFragment.class.getSimpleName();
     private AmazonS3Client s3;
     private CustomListAdapter simpleAdapter;
     private ArrayList<HashMap<String, Object>> fileNames;
@@ -34,6 +35,12 @@ public class MainListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        fileNames = new ArrayList<>();
+        simpleAdapter = new CustomListAdapter(getActivity(), fileNames, R.layout.snap_list_item,
+                new String[]{ "key" }, new int[]{ R.id.key });
+
+        setListAdapter(simpleAdapter);
     }
 
     @Override
@@ -45,24 +52,15 @@ public class MainListFragment extends ListFragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.refresh:
-                getListView().setVisibility(View.INVISIBLE);
-                new GetFileListTask().execute();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        new GetFileListTask().execute();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        fileNames = new ArrayList<>();
-        simpleAdapter = new CustomListAdapter(getActivity(), fileNames, R.layout.snap_list_item,
-                new String[]{ "key" }, new int[]{ R.id.key });
-
-        setListAdapter(simpleAdapter);
 
         // When an item is selected, finish the activity and pass back the S3
         // key associated with the object selected
@@ -87,7 +85,19 @@ public class MainListFragment extends ListFragment {
             }
         });
 
-        new GetFileListTask().execute();
+        fixKeys();
+        simpleAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.refresh:
+                getListView().setVisibility(View.INVISIBLE);
+                new GetFileListTask().execute();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void fixKeys() {

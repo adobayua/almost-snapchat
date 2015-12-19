@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     private AmazonS3 s3Client;
 
+    private MainListFragment mainListFragment;
+
     private DialogInterface.OnClickListener mDialogListener =
             new DialogInterface.OnClickListener() {
         @Override
@@ -164,9 +166,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Adding a ListFragment to the view
+        mainListFragment = new MainListFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.mainContent, new MainListFragment()).commit();
+                .add(R.id.mainContent, mainListFragment).commit();
     }
 
     @Override
