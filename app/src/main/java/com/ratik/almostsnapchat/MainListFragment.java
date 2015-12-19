@@ -4,12 +4,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ProgressBar;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -29,7 +28,7 @@ public class MainListFragment extends ListFragment {
     private CustomListAdapter simpleAdapter;
     private ArrayList<HashMap<String, Object>> fileNames;
 
-    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +46,14 @@ public class MainListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(
+                R.color.colorPrimary,
+                R.color.colorPrimaryDark,
+                R.color.colorAccent,
+        );
+
         return view;
     }
 
@@ -85,19 +91,16 @@ public class MainListFragment extends ListFragment {
             }
         });
 
-        fixKeys();
-        simpleAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.refresh:
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
                 getListView().setVisibility(View.INVISIBLE);
                 new GetFileListTask().execute();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+            }
+        });
+
+        fixKeys();
+        simpleAdapter.notifyDataSetChanged();
     }
 
     private void fixKeys() {
@@ -134,7 +137,12 @@ public class MainListFragment extends ListFragment {
             super.onPreExecute();
             s3 = Util.getS3Client(getActivity());
             getListView().getEmptyView().setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(true);
+                }
+            });
         }
 
         @Override
@@ -152,7 +160,7 @@ public class MainListFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(Void result) {
-            progressBar.setVisibility(View.INVISIBLE);
+            swipeRefreshLayout.setRefreshing(false);
             getListView().setVisibility(View.VISIBLE);
             // Filter blacklisted keys
             fixKeys();
