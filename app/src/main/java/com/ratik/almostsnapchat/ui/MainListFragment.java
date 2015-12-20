@@ -1,4 +1,4 @@
-package com.ratik.almostsnapchat;
+package com.ratik.almostsnapchat.ui;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -12,6 +12,9 @@ import android.widget.AdapterView;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.ratik.almostsnapchat.util.Constants;
+import com.ratik.almostsnapchat.R;
+import com.ratik.almostsnapchat.util.Util;
 import com.ratik.almostsnapchat.adapter.CustomListAdapter;
 
 import java.util.ArrayList;

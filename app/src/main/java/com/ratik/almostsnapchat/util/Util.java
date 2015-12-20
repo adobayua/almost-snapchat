@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.ratik.almostsnapchat;
+package com.ratik.almostsnapchat.util;
 
 import android.content.Context;
 import android.util.Log;

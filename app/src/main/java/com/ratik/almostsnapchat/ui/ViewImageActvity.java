@@ -1,4 +1,4 @@
-package com.ratik.almostsnapchat;
+package com.ratik.almostsnapchat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.widget.ProgressBar;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.ratik.almostsnapchat.util.Constants;
+import com.ratik.almostsnapchat.R;
+import com.ratik.almostsnapchat.util.Util;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 

@@ -1,4 +1,4 @@
-package com.ratik.almostsnapchat;
+package com.ratik.almostsnapchat.ui;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -15,8 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,6 +23,9 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.AmazonS3;
+import com.ratik.almostsnapchat.util.Constants;
+import com.ratik.almostsnapchat.R;
+import com.ratik.almostsnapchat.util.Util;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
