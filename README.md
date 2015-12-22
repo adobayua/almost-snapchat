@@ -27,3 +27,6 @@ how Amazon web services work.
    * Update "MY_BUCKET_ID" with the value in step 3;
    
 5. Run the app!
+
+## License
+MIT
